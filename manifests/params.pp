@@ -43,7 +43,7 @@ class varnish::params {
             '4' => '/usr/sbin/varnish_reload_vcl',
             '3' => '/usr/bin/varnish_reload_vcl',
           }
-          $service_template    = $::varnish::version_major ? {
+          $service_template    = $varnish::version_major ? {
             '6' => 'varnish6.service.erb',
             '5' => 'varnish.service.erb',
             '4' => 'varnish.service.erb',
@@ -53,13 +53,13 @@ class varnish::params {
 
         '8': {
           $os_service_provider = 'systemd'
-          $vcl_reload          = $::varnish::version_major ? {
+          $vcl_reload          = $varnish::version_major ? {
             '6' => '/usr/sbin/varnishreload',
             '5' => '/sbin/varnish_reload_vcl',
             '4' => '/usr/sbin/varnish_reload_vcl',
             '3' => '/usr/bin/varnish_reload_vcl',
           }
-          $service_template    = $::varnish::version_major ? {
+          $service_template    = $varnish::version_major ? {
             '6' => 'varnish6.service.erb',
             '5' => 'varnish.service.erb',
             '4' => 'varnish.service.erb',
