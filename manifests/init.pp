@@ -40,6 +40,7 @@
 # [*runtime_params*]
 #   Hash of key:value runtime parameters
 #
+# lint:ignore:optional_default
 class varnish (
   Hash $runtime_params                      = {},
   Boolean $addrepo                          = true,
@@ -63,12 +64,12 @@ class varnish (
   String $package_name                      = 'varnish',
   String $service_name                      = 'varnish',
   Optional[String] $vcl_reload_cmd          = undef,
-  String $vcl_reload_path                   = $::path,
+  String $vcl_reload_path                   = $facts['path'],
   Optional[Boolean] $use_domain_sockets     = false,
   Optional[Boolean] $use_tls_proxy          = false,
   Optional[Integer] $tls_proxy_port         = 8000,
+# lint:endignore
 ) {
-
   if $package_ensure == 'present' {
     $version_major = regsubst($varnish_version, '^(\d+)\.(\d+).*$', '\1')
     $version_minor = regsubst($varnish_version, '^(\d+)\.(\d+).*$', '\2')
@@ -86,35 +87,33 @@ class varnish (
     default => '',
   }
 
-  include ::varnish::params
+  include varnish::params
 
   if $vcl_reload_cmd == undef {
-    $vcl_reload = $::varnish::params::vcl_reload
+    $vcl_reload = $varnish::params::vcl_reload
   } else {
     $vcl_reload = $vcl_reload_cmd
   }
 
   if $addrepo {
-    class { '::varnish::repo':
-      before => Class['::varnish::install'],
+    class { 'varnish::repo':
+      before => Class['varnish::install'],
     }
   }
 
-  include ::varnish::install
+  include varnish::install
 
-
-  class { '::varnish::secret':
+  class { 'varnish::secret':
     secret  => $secret,
-    require => Class['::varnish::install'],
+    require => Class['varnish::install'],
   }
 
-  class { '::varnish::config':
-    require => Class['::varnish::secret'],
-    notify  => Class['::varnish::service'],
+  class { 'varnish::config':
+    require => Class['varnish::secret'],
+    notify  => Class['varnish::service'],
   }
 
-  class { '::varnish::service':
-    require => Class['::varnish::config'],
+  class { 'varnish::service':
+    require => Class['varnish::config'],
   }
-
 }
